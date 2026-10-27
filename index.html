@@ -4,10 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f8fafc" />
-    <meta
-      name="description"
-      content="A welcoming classroom hub for lessons, assignments, schedules, and student projects."
-    />
+    <meta name="description" content="A secure classroom hub for lessons, assignments, and student work." />
     <title>Classroom Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,231 +16,86 @@
     <link rel="stylesheet" href="css/styles.css" />
   </head>
   <body class="min-h-screen bg-slate-50 text-slate-800 antialiased">
-    <section id="login-screen" class="login-screen" aria-labelledby="login-title">
-      <div class="login-card">
-        <a class="mb-8 inline-flex items-center gap-3" href="#" aria-label="Classroom Hub">
-          <span class="brand-mark" aria-hidden="true">C</span>
-          <span><span class="block font-display text-lg font-extrabold tracking-tight text-slate-900">Classroom</span><span class="block text-xs font-semibold tracking-wide text-slate-400">HUB · ROOM 204</span></span>
-        </a>
-        <p class="section-eyebrow">WELCOME BACK</p>
-        <h1 id="login-title" class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">Sign in to your classroom</h1>
-        <p class="mt-2 text-sm leading-6 text-slate-500">Use the email and password provided by your teacher.</p>
-        <form id="login-form" class="mt-7 space-y-4" novalidate>
-          <div><label class="form-label" for="login-email">Email address</label><input id="login-email" name="email" class="form-control" type="email" autocomplete="username" required /></div>
-          <div><label class="form-label" for="login-password">Password</label><input id="login-password" name="password" class="form-control" type="password" autocomplete="current-password" required minlength="6" /></div>
-          <p id="login-message" class="form-message hidden" role="alert"></p>
-          <button id="login-submit" class="primary-button w-full" type="submit">Sign in</button>
-        </form>
-        <p class="mt-5 text-center text-xs leading-5 text-slate-400">Need an account or password help? Contact your teacher. Self-registration is disabled.</p>
-      </div>
-      <p class="login-footer">Classroom Hub · Secure classroom sign-in</p>
-    </section>
-    <div id="app-shell" class="hidden min-h-screen lg:flex">
-      <a class="skip-link" href="#main-content">Skip to main content</a>
-      <aside
-        id="sidebar"
-        class="sidebar fixed inset-y-0 left-0 z-30 flex w-72 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:static lg:translate-x-0"
-        aria-label="Main navigation"
-      >
-        <div class="flex items-center justify-between px-6 pb-7 pt-7">
-          <a class="flex items-center gap-3" href="#home" data-page="home" aria-label="Classroom Hub home">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <main id="main-content" class="min-h-screen">
+      <section id="login-screen" class="login-screen" aria-labelledby="login-title">
+        <div class="login-card">
+          <div class="mb-8 inline-flex items-center gap-3">
             <span class="brand-mark" aria-hidden="true">C</span>
-            <span>
-              <span class="block font-display text-lg font-extrabold tracking-tight text-slate-900">Classroom</span>
-              <span class="block text-xs font-semibold tracking-wide text-slate-400">HUB · ROOM 204</span>
-            </span>
-          </a>
-          <button id="close-menu" class="icon-button lg:hidden" type="button" aria-label="Close navigation">
-            <span aria-hidden="true">×</span>
-          </button>
+            <span><span class="block font-display text-lg font-extrabold tracking-tight text-slate-900">Classroom</span><span class="block text-xs font-semibold tracking-wide text-slate-400">HUB · ROOM 204</span></span>
+          </div>
+          <p class="section-eyebrow">WELCOME BACK</p>
+          <h1 id="login-title" class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">Sign in to your classroom</h1>
+          <p class="mt-2 text-sm leading-6 text-slate-500">Use the email and password provided by your teacher.</p>
+          <form id="login-form" class="mt-7 space-y-4" novalidate>
+            <div><label class="form-label" for="login-email">Email address</label><input id="login-email" name="email" class="form-control" type="email" autocomplete="username" required /></div>
+            <div><label class="form-label" for="login-password">Password</label><input id="login-password" name="password" class="form-control" type="password" autocomplete="current-password" required minlength="6" /></div>
+            <p id="login-message" class="form-message hidden" role="alert"></p>
+            <button id="login-submit" class="primary-button w-full" type="submit">Sign in</button>
+          </form>
+          <p class="mt-5 text-center text-xs leading-5 text-slate-400">Need an account or password help? Contact your teacher. Self-registration is disabled.</p>
         </div>
-        <div class="px-4">
-          <p class="nav-caption">Workspace</p>
-          <nav class="mt-2 space-y-1">
-            <a class="nav-link active" href="#home" data-page="home"><span class="nav-icon">⌂</span>Home</a>
-            <a class="nav-link" href="#schedule" data-page="schedule"><span class="nav-icon">▦</span>Schedule</a>
-            <a class="nav-link" href="#assignments" data-page="assignments">
-              <span class="nav-icon">▤</span>Assignments <span id="nav-assignment-count" class="nav-count"></span>
+        <p class="login-footer">Classroom Hub · Secure classroom access</p>
+      </section>
+
+      <div id="app-shell" class="hidden min-h-screen lg:flex">
+        <aside id="sidebar" class="sidebar fixed inset-y-0 left-0 z-30 flex w-72 -translate-x-full flex-col border-r border-slate-200 bg-white transition-transform duration-200 lg:static lg:translate-x-0" aria-label="Main navigation">
+          <div class="flex items-center justify-between px-6 pb-7 pt-7">
+            <a class="flex items-center gap-3" href="#home" data-page="home" aria-label="Classroom Hub home">
+              <span class="brand-mark" aria-hidden="true">C</span>
+              <span><span class="block font-display text-lg font-extrabold tracking-tight text-slate-900">Classroom</span><span class="block text-xs font-semibold tracking-wide text-slate-400">HUB · ROOM 204</span></span>
             </a>
-            <a class="nav-link" href="#resources" data-page="resources"><span class="nav-icon">▧</span>Resources</a>
-            <a class="nav-link" href="#showcase" data-page="showcase"><span class="nav-icon">✳</span>Showcase</a>
-          </nav>
-          <p class="nav-caption mt-8">Classroom</p>
-          <nav class="mt-2 space-y-1">
-            <a class="nav-link" href="#announcements" data-page="announcements">
-              <span class="nav-icon">◉</span>Announcements
-            </a>
-            <a id="teacher-nav-link" class="nav-link" href="#teacher" data-page="teacher">
-              <span class="nav-icon">♙</span>Teacher dashboard
-            </a>
-          </nav>
-        </div>
-        <div class="mt-auto p-4">
-          <div class="teacher-card">
+            <button id="close-menu" class="icon-button lg:hidden" type="button" aria-label="Close navigation">×</button>
+          </div>
+          <div class="px-4">
+            <p class="nav-caption">Classroom</p>
+            <nav id="main-nav" class="mt-2 space-y-1">
+              <a class="nav-link" href="#home" data-page="home"><span class="nav-icon">⌂</span>Overview</a>
+              <a class="nav-link" href="#schedule" data-page="schedule"><span class="nav-icon">▦</span>Schedule</a>
+              <a class="nav-link" href="#assignments" data-page="assignments"><span class="nav-icon">▤</span>Assignments</a>
+              <a class="nav-link" href="#resources" data-page="resources"><span class="nav-icon">▧</span>Resources</a>
+              <a class="nav-link" href="#announcements" data-page="announcements"><span class="nav-icon">◉</span>Announcements</a>
+              <a class="nav-link" href="#showcase" data-page="showcase"><span class="nav-icon">✳</span>Showcase</a>
+              <a class="nav-link" href="#attendance" data-page="attendance"><span class="nav-icon">✓</span>Attendance</a>
+              <a class="nav-link teacher-only hidden" href="#teacher" data-page="teacher"><span class="nav-icon">♙</span>Teacher dashboard</a>
+            </nav>
+          </div>
+          <div class="mt-auto p-4">
+            <div class="teacher-card">
+              <div class="flex items-center gap-3">
+                <div id="profile-avatar" class="avatar avatar-indigo">?</div>
+                <div class="min-w-0">
+                  <p id="profile-name" class="truncate text-sm font-bold text-slate-900">Classroom user</p>
+                  <p id="profile-role" class="text-xs capitalize text-slate-500">Student</p>
+                </div>
+              </div>
+              <button id="sign-out-button" class="secondary-button mt-3 w-full !min-h-9 !text-xs" type="button">Sign out</button>
+            </div>
+          </div>
+        </aside>
+        <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
+        <div class="min-w-0 flex-1">
+          <header class="topbar sticky top-0 z-20 flex h-[76px] items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur md:px-8">
             <div class="flex items-center gap-3">
-              <div id="profile-avatar" class="avatar avatar-indigo">?</div>
-              <div class="min-w-0">
-                <p id="profile-name" class="truncate text-sm font-bold text-slate-900">Classroom user</p>
-                <p id="profile-role" class="text-xs text-slate-500">Student</p>
-              </div>
+              <button id="open-menu" class="icon-button lg:hidden" type="button" aria-label="Open navigation">☰</button>
+              <div><p id="header-date" class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400"></p><p id="page-heading" class="font-display text-lg font-bold text-slate-900">Classroom overview</p></div>
             </div>
-            <button id="sign-out-button" class="secondary-button mt-3 w-full !min-h-9 !text-xs" type="button">Sign out</button>
-          </div>
-        </div>
-      </aside>
-
-      <div id="sidebar-backdrop" class="sidebar-backdrop hidden"></div>
-      <div class="min-w-0 flex-1">
-        <header class="topbar sticky top-0 z-20 flex h-[76px] items-center justify-between border-b border-slate-200/80 bg-white/90 px-4 backdrop-blur md:px-8">
-          <div class="flex items-center gap-3">
-            <button id="open-menu" class="icon-button lg:hidden" type="button" aria-label="Open navigation">
-              <span aria-hidden="true">☰</span>
-            </button>
-            <div>
-              <p id="header-date" class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400"></p>
-              <p id="page-heading" class="font-display text-lg font-bold text-slate-900">Good morning, class!</p>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <span class="hidden rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700 sm:inline-flex">
-              <span class="mr-2 mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Class is in session
-            </span>
             <div id="header-avatar" class="avatar avatar-sky" aria-label="Signed-in profile">?</div>
-          </div>
-        </header>
-
-        <main id="main-content" class="mx-auto max-w-[1440px] px-4 py-7 md:px-8 md:py-9" tabindex="-1">
-          <section id="page-home" class="page-section">
-            <div class="hero-panel relative overflow-hidden rounded-3xl p-6 text-white md:p-9">
-              <div class="hero-orb hero-orb-one"></div>
-              <div class="hero-orb hero-orb-two"></div>
-              <div class="relative z-10 max-w-2xl">
-                <p class="mb-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold text-blue-50">
-                  <span aria-hidden="true">✦</span> YOUR CLASSROOM, ALL IN ONE PLACE
-                </p>
-                <h1 class="font-display text-3xl font-extrabold leading-tight tracking-tight md:text-4xl">A great week starts<br class="hidden sm:block" /> with a little curiosity.</h1>
-                <p class="mt-3 max-w-xl text-sm leading-6 text-blue-100 md:text-base">Find today's lessons, keep up with your work, and celebrate what you're learning in Room 204.</p>
-                <a href="#assignments" data-page="assignments" class="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-50">
-                  View assignments <span aria-hidden="true">→</span>
-                </a>
-              </div>
-              <div class="hero-illustration hidden md:block" aria-hidden="true">
-                <div class="hero-book book-back"></div><div class="hero-book book-front"></div>
-                <div class="hero-spark">✦</div><div class="hero-pencil"></div>
-              </div>
-            </div>
-
-            <div class="mt-7 grid gap-5 xl:grid-cols-[1.45fr_1fr]">
-              <div class="panel-card">
-                <div class="mb-5 flex items-center justify-between gap-3">
-                  <div>
-                    <p class="section-eyebrow">YOUR DAY AT A GLANCE</p>
-                    <h2 id="today-title" class="mt-1 font-display text-xl font-bold text-slate-900">Today's schedule</h2>
-                    <p id="today-date" class="mt-1 text-sm text-slate-500"></p>
-                  </div>
-                  <a href="#schedule" data-page="schedule" class="text-sm font-bold text-blue-700 hover:text-blue-800">Full timetable <span aria-hidden="true">→</span></a>
-                </div>
-                <div id="home-schedule" class="space-y-3"></div>
-              </div>
-              <div class="space-y-5">
-                <div id="next-assignment-card" class="panel-card"></div>
-                <div class="panel-card">
-                  <div class="mb-4 flex items-center justify-between">
-                    <div><p class="section-eyebrow">STAY IN THE LOOP</p><h2 class="mt-1 font-display text-lg font-bold text-slate-900">Latest news</h2></div>
-                    <a href="#announcements" data-page="announcements" class="text-sm font-bold text-blue-700">See all</a>
-                  </div>
-                  <div id="latest-news"></div>
-                </div>
-              </div>
-            </div>
-            <div class="mt-7">
-              <div class="mb-4 flex items-end justify-between">
-                <div><p class="section-eyebrow">FROM YOUR TEACHER</p><h2 class="mt-1 font-display text-xl font-bold text-slate-900">Class announcements</h2></div>
-                <a href="#announcements" data-page="announcements" class="text-sm font-bold text-blue-700">All announcements <span aria-hidden="true">→</span></a>
-              </div>
-              <div id="home-announcements" class="grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
-            </div>
-          </section>
-
-          <section id="page-schedule" class="page-section hidden">
-            <div class="page-intro"><p class="section-eyebrow">PLAN YOUR WEEK</p><h1 class="page-title">Class schedule</h1><p class="page-description">A clear view of what's happening in Room 204, Monday through Friday.</p></div>
-            <div id="weekly-schedule" class="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-3"></div>
-          </section>
-
-          <section id="page-assignments" class="page-section hidden">
-            <div class="page-intro flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p class="section-eyebrow">KEEP MAKING PROGRESS</p><h1 class="page-title">Assignments</h1><p class="page-description">Your next steps, all in one place. Select an assignment to submit your work.</p></div>
-              <label class="sr-only" for="assignment-filter">Filter assignments</label><select id="assignment-filter" class="form-control w-full sm:w-48"><option value="all">All assignments</option><option value="upcoming">Upcoming</option><option value="submitted">Submitted</option></select>
-            </div>
-            <div id="assignment-list" class="mt-7 grid gap-4 lg:grid-cols-2"></div>
-          </section>
-
-          <section id="page-resources" class="page-section hidden">
-            <div class="page-intro"><p class="section-eyebrow">LEARN AT YOUR OWN PACE</p><h1 class="page-title">Learning resources</h1><p class="page-description">Helpful notes and links selected for our classroom.</p></div>
-            <div id="resource-list" class="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
-          </section>
-
-          <section id="page-showcase" class="page-section hidden">
-            <div class="page-intro flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p class="section-eyebrow">LOOK WHAT WE'VE LEARNED</p><h1 class="page-title">Student showcase</h1><p class="page-description">A place to celebrate creative work shared by our class.</p></div>
-              <button id="open-showcase-form" class="primary-button" type="button">＋ Share a project</button>
-            </div>
-            <div id="showcase-list" class="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
-            <form id="showcase-form" class="panel-card mt-6 hidden max-w-2xl" novalidate>
-              <div class="mb-5"><h2 class="font-display text-lg font-bold">Share your project</h2><p class="mt-1 text-sm text-slate-500">Your teacher will review it before it appears in the class showcase.</p></div>
-              <div class="space-y-4">
-                <div><label class="form-label" for="project-title">Project title</label><input id="project-title" class="form-control" maxlength="100" required /></div>
-                <div><label class="form-label" for="project-description">A few words about your project</label><textarea id="project-description" class="form-control" rows="3" maxlength="500" required></textarea></div>
-                <div><label class="form-label" for="project-url">Project link (optional)</label><input id="project-url" class="form-control" type="url" placeholder="https://" /></div>
-                <p id="showcase-form-message" class="form-message hidden" role="status"></p>
-                <div class="flex gap-3"><button class="primary-button" type="submit">Send for review</button><button id="cancel-showcase" class="secondary-button" type="button">Cancel</button></div>
-              </div>
-            </form>
-          </section>
-
-          <section id="page-announcements" class="page-section hidden">
-            <div class="page-intro"><p class="section-eyebrow">WHAT'S HAPPENING</p><h1 class="page-title">Announcements</h1><p class="page-description">Updates and reminders from Ms. Rivera.</p></div>
-            <div id="announcement-list" class="mt-7 max-w-4xl space-y-4"></div>
-          </section>
-
-          <section id="page-teacher" class="page-section hidden">
-            <div class="page-intro"><p class="section-eyebrow">TEACHER VIEW · DEMO ONLY</p><h1 class="page-title">Classroom dashboard</h1><p class="page-description">A sample overview for managing the class. These controls don't save to a server.</p></div>
-            <div class="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div class="stat-card"><span class="stat-icon bg-blue-50 text-blue-700">♙</span><p class="stat-label">Students</p><p id="student-total" class="stat-value">25</p><p class="stat-hint">Sample class roster</p></div>
-              <div class="stat-card"><span class="stat-icon bg-amber-50 text-amber-700">▤</span><p class="stat-label">Active assignments</p><p id="active-assignment-total" class="stat-value">0</p><p class="stat-hint">Open for submissions</p></div>
-              <div class="stat-card"><span class="stat-icon bg-emerald-50 text-emerald-700">✓</span><p class="stat-label">Submissions to review</p><p class="stat-value">8</p><p class="stat-hint">Sample dashboard figure</p></div>
-              <div class="stat-card"><span class="stat-icon bg-violet-50 text-violet-700">◷</span><p class="stat-label">Attendance today</p><p class="stat-value">23/25</p><p class="stat-hint">Sample dashboard figure</p></div>
-            </div>
-            <div class="panel-card mt-6">
-              <div class="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><div><h2 class="font-display text-lg font-bold text-slate-900">Student roster</h2><p class="mt-1 text-sm text-slate-500">All names below are fictional sample data.</p></div><label class="sr-only" for="student-search">Search students</label><input id="student-search" class="form-control w-full sm:max-w-xs" type="search" placeholder="Search students…" /></div>
-              <div class="overflow-x-auto"><table class="min-w-full text-left text-sm"><thead><tr class="border-b border-slate-100 text-xs uppercase tracking-wider text-slate-400"><th class="pb-3 pr-4 font-semibold">Student</th><th class="pb-3 pr-4 font-semibold">Student number</th><th class="pb-3 pr-4 font-semibold">Demo status</th><th class="pb-3 font-semibold"><span class="sr-only">Actions</span></th></tr></thead><tbody id="student-roster"></tbody></table></div>
-              <p id="roster-empty" class="hidden py-8 text-center text-sm text-slate-500">No students match that search.</p>
-            </div>
-            <div class="mt-6 grid gap-4 lg:grid-cols-2">
-              <div class="panel-card lg:col-span-2">
-                <div class="mb-5"><h2 class="font-display text-lg font-bold">Assignment manager</h2><p class="mt-1 text-sm text-slate-500">Edit assignment details shown to the class. Changes are temporary in this prototype.</p></div>
-                <div id="teacher-assignment-list" class="grid gap-3 md:grid-cols-2"></div>
-              </div>
-              <div class="panel-card"><div class="mb-4 flex items-center justify-between"><div><h2 class="font-display text-lg font-bold">Showcase review</h2><p class="mt-1 text-sm text-slate-500">Approve a sample project to display it.</p></div><span class="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700">Teacher demo</span></div><div id="review-queue" class="space-y-3"></div></div>
-              <div class="panel-card"><div class="mb-3"><h2 class="font-display text-lg font-bold">Prototype boundaries</h2><p class="mt-2 text-sm leading-6 text-slate-500">This dashboard uses fictional data and browser-only state. It has no login, attendance recording, gradebook, or persistent saving. Do not enter real student information. Later phases will move permissions into Supabase policies.</p></div></div>
-            </div>
-          </section>
-
-          <footer class="mt-12 border-t border-slate-200 pt-5 text-center text-xs text-slate-400">Classroom Hub · Phase 1 static prototype · All student data is fictional</footer>
-        </main>
+          </header>
+          <div id="page-content" class="mx-auto max-w-[1440px] px-4 py-7 md:px-8 md:py-9" tabindex="-1"></div>
+        </div>
       </div>
-    </div>
+    </main>
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
-    <dialog id="edit-record-dialog" class="edit-dialog" aria-labelledby="edit-dialog-title">
-      <form id="edit-record-form" novalidate>
+    <dialog id="record-dialog" class="edit-dialog">
+      <form id="record-form" novalidate>
         <div class="mb-5 flex items-start justify-between gap-4">
-          <div><p class="section-eyebrow">TEACHER DEMO</p><h2 id="edit-dialog-title" class="mt-1 font-display text-xl font-bold text-slate-900">Edit record</h2><p id="edit-dialog-description" class="mt-1 text-sm text-slate-500"></p></div>
-          <button id="close-edit-dialog" class="icon-button" type="button" aria-label="Close edit form">×</button>
+          <div><p class="section-eyebrow">CLASSROOM</p><h2 id="record-dialog-title" class="mt-1 font-display text-xl font-bold text-slate-900">Edit record</h2></div>
+          <button id="close-record-dialog" class="icon-button" type="button" aria-label="Close form">×</button>
         </div>
-        <div id="edit-dialog-fields" class="space-y-4"></div>
-        <p id="edit-dialog-error" class="form-message error mt-4 hidden" role="alert"></p>
-        <div class="mt-6 flex flex-wrap justify-end gap-3">
-          <button id="cancel-edit-dialog" class="secondary-button" type="button">Cancel</button>
-          <button class="primary-button" type="submit">Save changes</button>
-        </div>
+        <div id="record-dialog-fields" class="space-y-4"></div>
+        <p id="record-dialog-error" class="form-message error mt-4 hidden" role="alert"></p>
+        <div class="mt-6 flex justify-end gap-3"><button id="cancel-record-dialog" class="secondary-button" type="button">Cancel</button><button class="primary-button" type="submit">Save changes</button></div>
       </form>
     </dialog>
     <script type="module" src="js/app.js"></script>

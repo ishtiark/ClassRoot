@@ -1,46 +1,78 @@
 # Classroom Hub
 
-A responsive classroom website built with HTML, Tailwind CSS via CDN, and vanilla JavaScript modules. The current login uses Supabase Auth; classroom content and student names are still fictional sample data until later database phases.
+A vanilla JavaScript classroom website connected to Supabase Auth, PostgreSQL, Row Level Security (RLS), and private Storage buckets. The teacher and students use managed accounts; there is no public registration form.
 
-## Run it in VS Code
+## 1. Configure Supabase
 
-1. Open the `D:\ClassRoot` folder in VS Code.
-2. Copy `js/config.example.js` to `js/config.local.js`.
-3. In `js/config.local.js`, enter the Supabase project URL and **publishable** key from your project's API settings. Never use a service-role or secret key in this website.
-4. Run `index.html` using a local web server such as the **Live Server** VS Code extension. ES modules and Supabase Auth should not be tested by opening the file directly.
-5. Keep an internet connection available for the Tailwind CSS, Google Fonts, and Supabase client CDNs.
+1. Create a Supabase project in the Supabase dashboard.
+2. In **Project Settings → API**, copy the project URL and **publishable** key.
+3. Copy `js/config.example.js` to `js/config.local.js` and fill in the values:
 
-Run `supabase/schema.sql` in the Supabase SQL Editor before signing in. The `js/config.local.js` file is excluded from Git.
-
-## Configure accounts safely
-
-1. In Supabase Authentication settings, turn off public sign-ups. Accounts should be created by a trusted administrator, not from this public website.
-2. In Supabase Authentication → Users, create the teacher account and each student account with an email and initial password. Give each student their login details privately.
-3. In the Supabase SQL Editor, create the matching profile for each Auth user. Replace the email/name with the correct account details:
-
-   ```sql
-   insert into public.profiles (id, full_name, student_number, role)
-   select id, 'Teacher Name', null, 'teacher'
-   from auth.users
-   where email = 'teacher@example.edu';
-
-   insert into public.profiles (id, full_name, student_number, role)
-   select id, 'Student Name', 'S-001', 'student'
-   from auth.users
-   where email = 'student@example.edu';
+   ```js
+   export const supabaseUrl = "https://YOUR-PROJECT-ID.supabase.co";
+   export const supabasePublishableKey = "YOUR_PUBLISHABLE_KEY";
    ```
 
-   Run one insert per account and verify each insert adds one row. The schema deliberately gives browser users no profile insert, update, or delete permission. Assign the initial teacher role only through this trusted SQL setup.
-4. Use the email/password sign-in page to log in. A valid Auth account without a matching profile is signed out and shown a contact-teacher message.
+   A publishable key is intended for browser use. **Never** put a service-role or secret key in this website. The local config is ignored by Git.
+4. Open Supabase **SQL Editor**, paste in `supabase/schema.sql`, and run it once on a new project. It creates the classroom tables, access policies, helper functions, and two private file buckets. Do not run it on a database with valuable existing classroom data without first reviewing and backing up that data.
+5. In Supabase **Authentication settings**, disable public sign-ups.
+6. In **Authentication → URL Configuration**, add your local site URL to the allowed redirect URLs if required. With Live Server, this is commonly `http://127.0.0.1:5500/**`.
 
-The browser UI hides the teacher dashboard from student accounts based on the profile returned by Supabase. This is only navigation; real data access must be protected by RLS policies on each future application table. The current lessons, assignments, showcase, and roster are static sample content, not per-account Supabase records.
+## 2. Create teacher and student accounts
 
-## What is and is not connected
+Create Auth accounts using the Supabase dashboard's user management. Do not add a public account-creation form or expose the service-role key. For each Auth user, add a matching profile from the SQL Editor. Replace the sample values with the user's exact Auth email:
 
-- Supabase Auth email/password sign-in, session restoration, profile lookup, role-aware navigation, and sign-out are connected.
-- `profiles` has RLS enabled. Users can read their own profile; a teacher can read profiles. Browser roles cannot insert or change profiles or promote accounts.
-- Class schedules, assignments, resources, announcements, submissions, attendance, and showcase are still demo-only and are not yet connected to Supabase.
-- Teacher roster and assignment edits are local prototype interactions. They do not update `profiles` or assignment records.
-- Never enter real student data into the sample roster or demo forms.
+```sql
+insert into public.profiles (id, full_name, student_number, role)
+select id, 'Teacher Name', null, 'teacher'
+from auth.users
+where email = 'teacher@example.edu';
+```
 
-The Tailwind CDN is appropriate for prototyping only; production deployment should use a proper Tailwind build process.
+```sql
+insert into public.profiles (id, full_name, student_number, role)
+select id, 'Student Name', 'S-001', 'student'
+from auth.users
+where email = 'student@example.edu';
+```
+
+Run one student insert per account, with a unique student number. The database enforces one teacher, prevents browser users from changing roles, and permits the teacher to update student profile details. Authentication account creation, disabling, and password resets remain trusted-admin tasks.
+
+## 3. Run locally
+
+1. Open this folder in VS Code.
+2. Right-click `index.html` and select **Open with Live Server**. Use `http://localhost` or `http://127.0.0.1`; do not open the file as `file://`.
+3. Sign in with an Auth user that has a matching `profiles` row.
+
+An Auth user without a valid classroom profile is signed out and shown an error. The app uses Tailwind's CDN for development; production deployment should compile Tailwind CSS instead.
+
+## Features connected to Supabase
+
+- **Authentication:** Email/password sign-in, session restoration, and sign-out.
+- **Profiles:** Teacher roster, student numbers, and teacher-editable profile details.
+- **Schedule:** Students read; the teacher can create, edit, and delete lessons.
+- **Assignments:** Students read published work and submit text or optional private files. The teacher manages assignments, reads submissions, and records grades and feedback.
+- **Resources and announcements:** The teacher manages records; authenticated classroom users can read them.
+- **Attendance:** The teacher records attendance; students can view only their own history.
+- **Showcase:** Students submit projects; the teacher approves or rejects them. Classmates see only approved project details. Student profile IDs are not exposed through the showcase query.
+- **Storage:** Assignment materials and submission files use private buckets with RLS-protected object access and short-lived signed download links. Files are limited to 10 MB and PDF, PNG, JPG, or text.
+
+## Security notes
+
+- RLS is enabled on every classroom table. Hiding teacher controls in the browser is not the security boundary.
+- Students cannot view other students' submissions, grades, feedback, attendance, or pending projects.
+- Students cannot change their own grade, feedback, submission status, profile role, or showcase approval state.
+- The database enforces important constraints and uses teacher-only database functions for reviewing work and showcase entries.
+- Never store real student passwords, publishable project details that should remain private, or service-role credentials in source control.
+
+## Validate the setup
+
+After creating a teacher and two test students, try these checks:
+
+1. Sign in as a student. Verify they can read classroom data and cannot see teacher-only controls.
+2. Submit work as student A. Sign in as student B and verify student A's submission, feedback, and attendance are not visible.
+3. As the teacher, record attendance, review a submission, and approve a showcase entry.
+4. As a student, verify the approved project is visible, the pending project is not, and only that student's attendance and work are displayed.
+5. Try changing role, grade, feedback, attendance, or approval in the browser client; RLS and database grants should reject the request.
+
+If these permission checks do not behave as described, stop and review the SQL policies before using real student information.
