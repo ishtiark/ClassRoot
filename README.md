@@ -1,6 +1,6 @@
-# Classroom Hub
+# AI 2nd Batch — Thakurgaon
 
-A vanilla JavaScript classroom website connected to Supabase Auth, PostgreSQL, Row Level Security (RLS), and private Storage buckets. The teacher and students use managed accounts; there is no public registration form.
+A vanilla JavaScript classroom website for the AI 2nd Batch training in Thakurgaon, connected to Supabase Auth, PostgreSQL, Row Level Security (RLS), and private Storage buckets. The teacher and students use managed accounts; there is no public registration form.
 
 ## 1. Configure Supabase
 

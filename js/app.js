@@ -124,7 +124,7 @@ function navigate(page, updateHash = true) {
     else link.removeAttribute("aria-current");
   });
   document.querySelector("#page-heading").textContent = pageTitles[selected];
-  document.title = `${pageTitles[selected]} · Classroom Hub`;
+  document.title = `${pageTitles[selected]} · AI 2nd Batch`;
   closeMenu();
   loadPage(selected);
 }
