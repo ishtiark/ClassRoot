@@ -194,7 +194,14 @@ function renderScheduleRows(rows, teacher) {
 }
 
 async function renderHome() {
-  const [schedules, assignments, announcements] = await Promise.all([getSchedules(), getAssignments(), getAnnouncements()]);
+  const isTeacher = activeSession.profile.role === "teacher";
+  const [schedules, assignments, announcements, requests] = await Promise.all([
+    getSchedules(),
+    getAssignments(),
+    getAnnouncements(),
+    isTeacher ? getEnrollmentRequests() : Promise.resolve([]),
+  ]);
+  updatePendingRequestBadge(requests.length);
   const now = new Date();
   const day = now.getDay();
   const dayNumber = day === 0 || day === 6 ? 1 : day;
@@ -205,14 +212,24 @@ async function renderHome() {
     "CLASSROOM OVERVIEW",
     `Welcome, ${activeSession.profile.full_name.split(" ")[0]}`,
     "Your classroom information is loaded from Supabase.",
-    activeSession.profile.role === "teacher" ? teacherButton("Manage classroom", "navigate", "teacher", "primary-button") : "",
+    isTeacher ? teacherButton(requests.length ? `${requests.length} student request${requests.length === 1 ? "" : "s"} to review` : "Manage classroom", "navigate", "teacher", "primary-button") : "",
   );
-  document.querySelector("#page-content").innerHTML = `${header}
+  const requestNotice = isTeacher && requests.length
+    ? `<button class="panel-card mt-6 flex w-full flex-wrap items-center justify-between gap-3 border-amber-200 bg-amber-50 text-left" type="button" data-action="navigate" data-id="teacher"><span><span class="block font-bold text-amber-900">${requests.length} student access request${requests.length === 1 ? "" : "s"} waiting for approval</span><span class="mt-1 block text-sm text-amber-800">Review each request and assign a student number when approving.</span></span><span class="font-bold text-amber-900">Review requests →</span></button>`
+    : "";
+  document.querySelector("#page-content").innerHTML = `${header}${requestNotice}
     <div class="mt-7 grid gap-5 xl:grid-cols-[1.4fr_1fr]">
       <section><div class="mb-4"><p class="section-eyebrow">THIS WEEK</p><h2 class="mt-1 font-display text-xl font-bold">Today’s lessons</h2><p class="mt-1 text-sm text-slate-500">${prettyDate(now.getDay() === 0 || now.getDay() === 6 ? new Date(now.getTime() + (day === 0 ? 86400000 : 2 * 86400000)) : now, { weekday: "long", month: "long", day: "numeric" })}</p></div><div class="space-y-3">${renderScheduleRows(schedules.filter((row) => row.day_of_week === dayNumber), activeSession.profile.role === "teacher")}</div></section>
       <div class="space-y-5"><section class="panel-card"><p class="section-eyebrow">NEXT DEADLINE</p>${nextAssignment ? `<h2 class="mt-2 font-display text-lg font-bold">${escapeHtml(nextAssignment.title)}</h2><p class="mt-1 text-sm text-slate-500">Due ${prettyDate(nextAssignment.due_at, { weekday: "short", month: "short", day: "numeric" })}</p><button class="mt-4 text-sm font-bold text-blue-700" type="button" data-action="navigate" data-id="assignments">View assignment →</button>` : '<p class="mt-2 text-sm text-slate-500">No upcoming deadlines.</p>'}</section>
       <section class="panel-card"><p class="section-eyebrow">LATEST NEWS</p>${recentAnnouncements.length ? recentAnnouncements.map((item) => `<article class="mt-4 border-t border-slate-100 pt-4 first:border-0 first:pt-0"><h3 class="font-bold">${escapeHtml(item.title)}</h3><p class="mt-1 text-sm leading-6 text-slate-500">${escapeHtml(item.content)}</p></article>`).join("") : '<p class="mt-3 text-sm text-slate-500">No announcements yet.</p>'}</section></div>
     </div>`;
+}
+
+function updatePendingRequestBadge(count) {
+  const badge = document.querySelector("#pending-request-badge");
+  if (!badge) return;
+  badge.textContent = String(count);
+  badge.classList.toggle("hidden", count === 0);
 }
 
 async function renderSchedulePage() {
@@ -309,6 +326,7 @@ async function renderTeacherPage() {
     getEnrollmentRequests(),
   ]);
   const activeStudents = roster.filter((student) => student.active).length;
+  updatePendingRequestBadge(requests.length);
   const needsReview = submissions.filter((item) => item.status !== "reviewed").length;
   const pendingProjects = projects.filter((item) => item.review_status === "pending").length;
   const rosterRows = roster.map((student) => `<tr class="roster-row"><td class="py-3 pr-4"><p class="font-semibold">${escapeHtml(student.full_name)}</p><p class="text-xs ${student.active ? "text-emerald-700" : "text-slate-400"}">${student.active ? "Active" : "Access disabled"}</p></td><td class="py-3 pr-4 text-slate-500">${escapeHtml(student.student_number)}</td><td class="py-3 text-right"><div class="flex flex-wrap justify-end gap-2">${teacherButton("Edit", "edit-student", student.id)}${teacherButton(student.active ? "Disable access" : "Restore access", "toggle-student-access", student.id, student.active ? "danger-button" : "secondary-button")}</div></td></tr>`).join("");
