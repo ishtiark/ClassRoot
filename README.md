@@ -6,19 +6,29 @@ A vanilla JavaScript classroom website connected to Supabase Auth, PostgreSQL, R
 
 1. Create a Supabase project in the Supabase dashboard.
 2. In **Project Settings → API**, copy the project URL and **publishable** key.
-3. Copy `js/config.example.js` to `js/config.local.js` and fill in the values:
+3. Put those values in `js/config.js`:
 
    ```js
    export const supabaseUrl = "https://YOUR-PROJECT-ID.supabase.co";
    export const supabasePublishableKey = "YOUR_PUBLISHABLE_KEY";
    ```
 
-   A publishable key is intended for browser use. **Never** put a service-role or secret key in this website. The local config is ignored by Git.
+   The project URL and publishable key are intended to be visible in browser code and are committed so GitHub Pages can load them. **Never** put a service-role or secret key in this website. Security must come from the database's RLS policies.
 4. Open Supabase **SQL Editor**, paste in `supabase/schema.sql`, and run it once on a new project. It creates the classroom tables, access policies, helper functions, and two private file buckets. Do not run it on a database with valuable existing classroom data without first reviewing and backing up that data.
 5. In Supabase **Authentication settings**, disable public sign-ups.
 6. In **Authentication → URL Configuration**, add your local site URL to the allowed redirect URLs if required. With Live Server, this is commonly `http://127.0.0.1:5500/**`.
 
-## 2. Create teacher and student accounts
+## 4. Publish with GitHub Pages
+
+1. Push the project to the `main` branch on GitHub.
+2. In the repository, open **Settings → Pages** and set the source to **GitHub Actions**.
+3. Open **Actions** and wait for the **Deploy to GitHub Pages** workflow to finish.
+4. The site will be available at `https://<your-github-username>.github.io/<repository-name>/`.
+5. In Supabase **Authentication → URL Configuration**, set the Site URL to that address and add it to the Redirect URLs list.
+
+The workflow deploys the static files directly; no build step is required.
+
+## 5. Create teacher and student accounts
 
 Create Auth accounts using the Supabase dashboard's user management. Do not add a public account-creation form or expose the service-role key. For each Auth user, add a matching profile from the SQL Editor. Replace the sample values with the user's exact Auth email:
 
@@ -38,7 +48,7 @@ where email = 'student@example.edu';
 
 Run one student insert per account, with a unique student number. The database enforces one teacher, prevents browser users from changing roles, and permits the teacher to update student profile details. Authentication account creation, disabling, and password resets remain trusted-admin tasks.
 
-## 3. Run locally
+## 6. Run locally
 
 1. Open this folder in VS Code.
 2. Right-click `index.html` and select **Open with Live Server**. Use `http://localhost` or `http://127.0.0.1`; do not open the file as `file://`.

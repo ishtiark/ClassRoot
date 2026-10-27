@@ -1,10 +1,10 @@
-import { supabasePublishableKey, supabaseUrl } from "./config.local.js";
+import { supabasePublishableKey, supabaseUrl } from "./config.js";
 
 let clientPromise;
 
 export async function getSupabaseClient() {
   if (!supabaseUrl || !supabasePublishableKey) {
-    throw new Error("Supabase is not configured. Add your project URL and publishable key to js/config.local.js.");
+    throw new Error("Supabase is not configured. Add your project URL and publishable key to js/config.js.");
   }
 
   if (!clientPromise) {
