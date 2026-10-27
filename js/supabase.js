@@ -19,15 +19,32 @@ export async function getClassroomProfile(userId) {
   const supabase = await getSupabaseClient();
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, full_name, student_number, role")
+    .select("id, full_name, student_number, role, active")
     .eq("id", userId)
     .maybeSingle();
 
   if (error) throw new Error(`Could not load your classroom profile: ${error.message}`);
-  if (!data || !["teacher", "student"].includes(data.role)) {
-    throw new Error("This sign-in is not linked to a classroom profile. Contact your teacher.");
+  if (data?.active && ["teacher", "student"].includes(data.role)) return data;
+
+  const { data: request, error: requestError } = await supabase
+    .from("enrollment_requests")
+    .select("status")
+    .eq("id", userId)
+    .maybeSingle();
+  if (requestError) {
+    throw new Error(`Could not check your student access request: ${requestError.message}`);
   }
-  return data;
+
+  if (data && !data.active) throw new Error("Your classroom access has been disabled. Contact your teacher.");
+  if (request?.status === "pending") throw new Error("Your student request is waiting for teacher approval.");
+  if (request?.status === "rejected") throw new Error("Your student request was not approved. Contact your teacher.");
+  throw new Error("This sign-in is not linked to an active classroom profile. Contact your teacher.");
+}
+
+async function signOutAfterAccessError(supabase, error) {
+  const { error: signOutError } = await supabase.auth.signOut();
+  if (signOutError) throw new Error(`${error.message} Sign-out also failed: ${signOutError.message}`);
+  throw error;
 }
 
 export async function signInWithPassword(email, password) {
@@ -39,10 +56,29 @@ export async function signInWithPassword(email, password) {
     const profile = await getClassroomProfile(data.user.id);
     return { user: data.user, profile };
   } catch (error) {
-    const { error: signOutError } = await supabase.auth.signOut();
-    if (signOutError) throw new Error(`${error.message} Sign-out also failed: ${signOutError.message}`);
-    throw error;
+    await signOutAfterAccessError(supabase, error);
   }
+}
+
+export async function registerStudent(fullName, email, password) {
+  const supabase = await getSupabaseClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName, request_student_access: true },
+      emailRedirectTo: `${window.location.origin}${window.location.pathname}`,
+    },
+  });
+  if (error) throw new Error(`Could not submit your student request: ${error.message}`);
+
+  if (data.session) {
+    const { error: signOutError } = await supabase.auth.signOut();
+    if (signOutError) {
+      throw new Error(`Your request was created, but automatic sign-out failed: ${signOutError.message}`);
+    }
+  }
+  return { confirmationRequired: !data.session };
 }
 
 export async function getCurrentSession() {
@@ -55,9 +91,7 @@ export async function getCurrentSession() {
     const profile = await getClassroomProfile(data.session.user.id);
     return { user: data.session.user, profile };
   } catch (error) {
-    const { error: signOutError } = await supabase.auth.signOut();
-    if (signOutError) throw new Error(`${error.message} Sign-out also failed: ${signOutError.message}`);
-    throw error;
+    await signOutAfterAccessError(supabase, error);
   }
 }
 

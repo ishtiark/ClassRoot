@@ -1,6 +1,6 @@
 # AI 2nd Batch — Thakurgaon
 
-A vanilla JavaScript classroom website for the AI 2nd Batch training in Thakurgaon, connected to Supabase Auth, PostgreSQL, Row Level Security (RLS), and private Storage buckets. The teacher and students use managed accounts; there is no public registration form.
+A vanilla JavaScript classroom website for the AI 2nd Batch training in Thakurgaon, connected to Supabase Auth, PostgreSQL, Row Level Security (RLS), and private Storage buckets. Students can request accounts, but cannot access classroom data until the teacher approves them.
 
 ## 1. Configure Supabase
 
@@ -15,8 +15,9 @@ A vanilla JavaScript classroom website for the AI 2nd Batch training in Thakurga
 
    The project URL and publishable key are intended to be visible in browser code and are committed so GitHub Pages can load them. **Never** put a service-role or secret key in this website. Security must come from the database's RLS policies.
 4. Open Supabase **SQL Editor**, paste in `supabase/schema.sql`, and run it once on a new project. It creates the classroom tables, access policies, helper functions, and two private file buckets. Do not run it on a database with valuable existing classroom data without first reviewing and backing up that data.
-5. In Supabase **Authentication settings**, disable public sign-ups.
-6. In **Authentication → URL Configuration**, add your local site URL to the allowed redirect URLs if required. With Live Server, this is commonly `http://127.0.0.1:5500/**`.
+5. Run `supabase/enrollment-migration.sql` in the SQL Editor. It adds student request approval, active/inactive access, and an Auth signup trigger. Existing student records remain active.
+6. In Supabase **Authentication settings**, enable email sign-ups and email confirmations. Add CAPTCHA protection if available. The trigger stores new sign-ups as pending requests; only teacher approval creates an active classroom profile.
+7. In **Authentication → URL Configuration**, add your local site URL to the allowed redirect URLs if required. With Live Server, this is commonly `http://127.0.0.1:5500/**`.
 
 ## 4. Publish with GitHub Pages
 
@@ -30,7 +31,9 @@ The workflow deploys the static files directly; no build step is required.
 
 ## 5. Create teacher and student accounts
 
-Create Auth accounts using the Supabase dashboard's user management. Do not add a public account-creation form or expose the service-role key. For each Auth user, add a matching profile from the SQL Editor. Replace the sample values with the user's exact Auth email:
+Create the teacher Auth account through Supabase dashboard user management, then add its matching profile from the SQL Editor. Do not expose a service-role key. For students, they can select **New student? Request access** on the sign-in page. The teacher reviews their name and email in the dashboard and assigns a unique student number when approving. Rejected requests and unapproved accounts cannot access classroom data.
+
+To add an existing Auth user as the teacher, replace the sample values with that user's exact Auth email:
 
 ```sql
 insert into public.profiles (id, full_name, student_number, role)
@@ -46,7 +49,7 @@ from auth.users
 where email = 'student@example.edu';
 ```
 
-Run one student insert per account, with a unique student number. The database enforces one teacher, prevents browser users from changing roles, and permits the teacher to update student profile details. Authentication account creation, disabling, and password resets remain trusted-admin tasks.
+The database enforces one teacher and prevents browser users from changing roles. In the Teacher dashboard, disabling a student's access preserves their submissions, grades, and attendance; access can be restored later. Authentication account deletion and password resets remain trusted-admin tasks.
 
 ## 6. Run locally
 
@@ -58,8 +61,8 @@ An Auth user without a valid classroom profile is signed out and shown an error.
 
 ## Features connected to Supabase
 
-- **Authentication:** Email/password sign-in, session restoration, and sign-out.
-- **Profiles:** Teacher roster, student numbers, and teacher-editable profile details.
+- **Authentication and enrollment:** Email/password sign-in, student access requests, teacher approval/rejection, and session restoration. Email confirmation should be enabled in Supabase.
+- **Profiles:** Teacher roster, student numbers, profile editing, and reversible student access disabling.
 - **Schedule:** Students read; the teacher can create, edit, and delete lessons.
 - **Assignments:** Students read published work and submit text or optional private files. The teacher manages assignments, reads submissions, and records grades and feedback.
 - **Resources and announcements:** The teacher manages records; authenticated classroom users can read them.
@@ -73,6 +76,7 @@ An Auth user without a valid classroom profile is signed out and shown an error.
 - Students cannot view other students' submissions, grades, feedback, attendance, or pending projects.
 - Students cannot change their own grade, feedback, submission status, profile role, or showcase approval state.
 - The database enforces important constraints and uses teacher-only database functions for reviewing work and showcase entries.
+- New Auth sign-ups are pending only. Approval creates the student profile; disabling access removes app access while preserving classroom records.
 - Never store real student passwords, publishable project details that should remain private, or service-role credentials in source control.
 
 ## Validate the setup

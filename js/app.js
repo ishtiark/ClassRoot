@@ -3,9 +3,11 @@ import {
   deleteAssignment,
   deleteResource,
   deleteSchedule,
+  approveEnrollmentRequest,
   getAnnouncements,
   getAssignments,
   getAttendance,
+  getEnrollmentRequests,
   getMyAttendance,
   getResources,
   getRoster,
@@ -15,6 +17,7 @@ import {
   getSubmissions,
   reviewShowcase,
   reviewSubmission,
+  rejectEnrollmentRequest,
   removeAssignmentAttachment,
   saveAnnouncement,
   saveAssignment,
@@ -23,10 +26,11 @@ import {
   saveSchedule,
   saveShowcase,
   saveSubmission,
+  setStudentAccess,
   updateStudentProfile,
   uploadAssignmentAttachment,
 } from "./classroom-api.js";
-import { getCurrentSession, signInWithPassword, signOut } from "./supabase.js";
+import { getCurrentSession, registerStudent, signInWithPassword, signOut } from "./supabase.js";
 
 const pageTitles = {
   home: "Classroom overview",
@@ -288,8 +292,9 @@ async function renderAttendancePage() {
   }
   const date = todayString();
   const [roster, attendance] = await Promise.all([getRoster(), getAttendance(date)]);
+  const activeRoster = roster.filter((student) => student.active);
   const byStudent = new Map(attendance.map((record) => [record.student_id, record]));
-  const rows = roster.map((student) => {
+  const rows = activeRoster.map((student) => {
     const record = byStudent.get(student.id);
     return `<form class="attendance-row data-form" data-form="attendance" data-student="${escapeHtml(student.id)}"><div><p class="font-semibold">${escapeHtml(student.full_name)}</p><p class="text-xs text-slate-400">${escapeHtml(student.student_number)}</p></div><label class="sr-only" for="attendance-${escapeHtml(student.id)}">Attendance for ${escapeHtml(student.full_name)}</label><select id="attendance-${escapeHtml(student.id)}" class="form-control" name="status"><option value="">Not recorded</option>${statuses.map((status) => `<option value="${status}" ${record?.status === status ? "selected" : ""}>${status[0].toUpperCase()}${status.slice(1)}</option>`).join("")}</select><button class="secondary-button" type="submit">Save</button></form>`;
   }).join("");
@@ -297,11 +302,18 @@ async function renderAttendancePage() {
 }
 
 async function renderTeacherPage() {
-  const [roster, submissions, projects] = await Promise.all([getRoster(), getSubmissions(), getShowcase(true)]);
+  const [roster, submissions, projects, requests] = await Promise.all([
+    getRoster(),
+    getSubmissions(),
+    getShowcase(true),
+    getEnrollmentRequests(),
+  ]);
+  const activeStudents = roster.filter((student) => student.active).length;
   const needsReview = submissions.filter((item) => item.status !== "reviewed").length;
   const pendingProjects = projects.filter((item) => item.review_status === "pending").length;
-  const rosterRows = roster.map((student) => `<tr class="roster-row"><td class="py-3 pr-4 font-semibold">${escapeHtml(student.full_name)}</td><td class="py-3 pr-4 text-slate-500">${escapeHtml(student.student_number)}</td><td class="py-3 text-right">${teacherButton("Edit", "edit-student", student.id)}</td></tr>`).join("");
-  document.querySelector("#page-content").innerHTML = `${pageIntro("TEACHER TOOLS", "Teacher dashboard", "Manage classroom records, review work, and record attendance.")}<div class="mt-7 grid gap-4 sm:grid-cols-3"><div class="stat-card"><p class="stat-label">Student accounts</p><p class="stat-value">${roster.length}</p><p class="stat-hint">Create or disable Auth accounts in Supabase.</p></div><div class="stat-card"><p class="stat-label">To review</p><p class="stat-value">${needsReview}</p><p class="stat-hint">Student submissions</p></div><div class="stat-card"><p class="stat-label">Projects awaiting approval</p><p class="stat-value">${pendingProjects}</p><p class="stat-hint">Student showcase</p></div></div><section class="panel-card mt-6"><div class="mb-4"><h2 class="font-display text-lg font-bold">Student roster</h2><p class="mt-1 text-sm text-slate-500">Accounts are provisioned through Supabase Auth; you can edit profile details here.</p></div><div class="overflow-x-auto"><table class="min-w-full text-left text-sm"><thead><tr class="border-b border-slate-100 text-xs uppercase tracking-wider text-slate-400"><th class="pb-3 pr-4">Student</th><th class="pb-3 pr-4">Student number</th><th class="pb-3"></th></tr></thead><tbody>${rosterRows}</tbody></table></div></section><div class="mt-6 grid gap-3 sm:grid-cols-3">${teacherButton("Manage schedule", "navigate", "schedule", "primary-button")}${teacherButton("Manage assignments", "navigate", "assignments", "primary-button")}${teacherButton("Manage announcements", "navigate", "announcements", "primary-button")}</div>`;
+  const rosterRows = roster.map((student) => `<tr class="roster-row"><td class="py-3 pr-4"><p class="font-semibold">${escapeHtml(student.full_name)}</p><p class="text-xs ${student.active ? "text-emerald-700" : "text-slate-400"}">${student.active ? "Active" : "Access disabled"}</p></td><td class="py-3 pr-4 text-slate-500">${escapeHtml(student.student_number)}</td><td class="py-3 text-right"><div class="flex flex-wrap justify-end gap-2">${teacherButton("Edit", "edit-student", student.id)}${teacherButton(student.active ? "Disable access" : "Restore access", "toggle-student-access", student.id, student.active ? "danger-button" : "secondary-button")}</div></td></tr>`).join("");
+  const requestCards = requests.map((request) => `<article class="rounded-xl border border-slate-100 p-4"><div class="flex flex-wrap justify-between gap-2"><div><h3 class="font-bold">${escapeHtml(request.full_name)}</h3><p class="mt-1 text-sm text-slate-500">${escapeHtml(request.email)}</p></div><p class="text-xs text-slate-400">Requested ${prettyDate(request.created_at)}</p></div><div class="mt-4 flex flex-wrap items-end gap-3"><form class="data-form flex flex-1 flex-wrap items-end gap-3" data-form="approve-enrollment" data-id="${escapeHtml(request.id)}"><div class="min-w-40 flex-1"><label class="form-label" for="student-number-${escapeHtml(request.id)}">Assign student number</label><input id="student-number-${escapeHtml(request.id)}" class="form-control" name="student_number" required maxlength="50" pattern="[A-Za-z0-9._-]{1,50}" title="Use 1–50 letters, numbers, dots, underscores, or hyphens" placeholder="e.g. S-026" /></div><button class="primary-button" type="submit">Approve</button></form>${teacherButton("Reject", "reject-enrollment", request.id, "danger-button")}</div></article>`).join("");
+  document.querySelector("#page-content").innerHTML = `${pageIntro("TEACHER TOOLS", "Teacher dashboard", "Approve student access requests and manage classroom membership.")}<div class="mt-7 grid gap-4 sm:grid-cols-3"><div class="stat-card"><p class="stat-label">Active students</p><p class="stat-value">${activeStudents}</p><p class="stat-hint">${roster.length - activeStudents} with access disabled</p></div><div class="stat-card"><p class="stat-label">To review</p><p class="stat-value">${needsReview}</p><p class="stat-hint">Student submissions</p></div><div class="stat-card"><p class="stat-label">Projects awaiting approval</p><p class="stat-value">${pendingProjects}</p><p class="stat-hint">Student showcase</p></div></div><section class="panel-card mt-6"><div class="mb-4"><h2 class="font-display text-lg font-bold">Student access requests</h2><p class="mt-1 text-sm text-slate-500">Approve requests to add students. Choose a unique student number for each approved student.</p></div><div class="space-y-3">${requestCards || emptyState("There are no pending student requests.")}</div></section><section class="panel-card mt-6"><div class="mb-4"><h2 class="font-display text-lg font-bold">Student roster</h2><p class="mt-1 text-sm text-slate-500">Disabling access keeps the student’s submissions, grades, and attendance history.</p></div><div class="overflow-x-auto"><table class="min-w-full text-left text-sm"><thead><tr class="border-b border-slate-100 text-xs uppercase tracking-wider text-slate-400"><th class="pb-3 pr-4">Student</th><th class="pb-3 pr-4">Student number</th><th class="pb-3 text-right">Actions</th></tr></thead><tbody>${rosterRows || '<tr><td class="py-4 text-sm text-slate-500" colspan="3">No student profiles yet.</td></tr>'}</tbody></table></div></section><div class="mt-6 grid gap-3 sm:grid-cols-3">${teacherButton("Manage schedule", "navigate", "schedule", "primary-button")}${teacherButton("Manage assignments", "navigate", "assignments", "primary-button")}${teacherButton("Manage announcements", "navigate", "announcements", "primary-button")}</div>`;
 }
 
 function fieldMarkup(field) {
@@ -490,6 +502,10 @@ async function handleDataForm(form) {
     if (!values.status) throw new Error("Choose an attendance status.");
     await saveAttendance(form.dataset.student, todayString(), values.status);
     showToast("Attendance saved.");
+  } else if (type === "approve-enrollment") {
+    const values = await formValues(form);
+    await approveEnrollmentRequest(form.dataset.id, String(values.student_number).trim());
+    showToast("Student request approved.");
   }
   await loadPage(document.querySelector(".nav-link.active")?.dataset.page || "home");
 }
@@ -529,6 +545,25 @@ async function handleAction(button) {
     await remove(id);
     showToast(`${noun[0].toUpperCase()}${noun.slice(1)} deleted.`);
     return loadPage(document.querySelector(".nav-link.active")?.dataset.page || "home");
+  }
+  if (action === "reject-enrollment") {
+    if (!confirm("Reject this student access request? The Auth account will remain but will not have classroom access.")) return;
+    await rejectEnrollmentRequest(id);
+    showToast("Student request rejected.");
+    return loadPage("teacher");
+  }
+  if (action === "toggle-student-access") {
+    const roster = await getRoster();
+    const student = roster.find((item) => item.id === id);
+    if (!student) throw new Error("The student profile could not be found. Refresh the page.");
+    const enableAccess = !student.active;
+    const prompt = enableAccess
+      ? `Restore classroom access for ${student.full_name}?`
+      : `Disable classroom access for ${student.full_name}? Their records will be kept.`;
+    if (!confirm(prompt)) return;
+    await setStudentAccess(id, enableAccess);
+    showToast(enableAccess ? "Student access restored." : "Student access disabled.");
+    return loadPage("teacher");
   }
   if (action === "approve-showcase" || action === "reject-showcase") {
     await reviewShowcase(id, action === "approve-showcase");
@@ -571,6 +606,37 @@ async function handleLogin(event) {
   }
 }
 
+async function handleStudentSignup(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  if (!form.reportValidity()) return;
+  const button = document.querySelector("#signup-submit");
+  const message = document.querySelector("#signup-message");
+  button.disabled = true;
+  button.textContent = "Sending request…";
+  message.classList.add("hidden");
+  message.classList.remove("error");
+  try {
+    const { confirmationRequired } = await registerStudent(
+      form.elements.full_name.value.trim(),
+      form.elements.email.value.trim(),
+      form.elements.password.value,
+    );
+    form.reset();
+    message.textContent = confirmationRequired
+      ? "If registration succeeded, check your email to confirm your address. After that, wait for teacher approval before signing in. If you already have an account, sign in instead."
+      : "Your request was sent. The teacher must approve it before you can sign in.";
+    message.classList.remove("hidden");
+  } catch (error) {
+    message.textContent = getErrorMessage(error);
+    message.classList.remove("hidden");
+    message.classList.add("error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Send access request";
+  }
+}
+
 async function handleSignOut() {
   const button = document.querySelector("#sign-out-button");
   button.disabled = true;
@@ -586,6 +652,7 @@ async function handleSignOut() {
 
 function bindEvents() {
   document.querySelector("#login-form").addEventListener("submit", handleLogin);
+  document.querySelector("#student-signup-form").addEventListener("submit", handleStudentSignup);
   document.querySelector("#sign-out-button").addEventListener("click", handleSignOut);
   document.querySelector("#open-menu").addEventListener("click", openMenu);
   document.querySelector("#close-menu").addEventListener("click", closeMenu);

@@ -26,14 +26,24 @@
           </div>
           <p class="section-eyebrow">WELCOME BACK</p>
           <h1 id="login-title" class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">Sign in to your classroom</h1>
-          <p class="mt-2 text-sm leading-6 text-slate-500">Use the email and password provided by your teacher.</p>
+          <p class="mt-2 text-sm leading-6 text-slate-500">Sign in with your classroom email and password.</p>
           <form id="login-form" class="mt-7 space-y-4" novalidate>
             <div><label class="form-label" for="login-email">Email address</label><input id="login-email" name="email" class="form-control" type="email" autocomplete="username" required /></div>
             <div><label class="form-label" for="login-password">Password</label><input id="login-password" name="password" class="form-control" type="password" autocomplete="current-password" required minlength="6" /></div>
             <p id="login-message" class="form-message hidden" role="alert"></p>
             <button id="login-submit" class="primary-button w-full" type="submit">Sign in</button>
           </form>
-          <p class="mt-5 text-center text-xs leading-5 text-slate-400">Need an account or password help? Contact your teacher. Self-registration is disabled.</p>
+          <details class="mt-6 border-t border-slate-100 pt-4">
+            <summary class="cursor-pointer text-center text-sm font-bold text-blue-700">New student? Request access</summary>
+            <form id="student-signup-form" class="mt-4 space-y-4" novalidate>
+              <div><label class="form-label" for="signup-name">Full name</label><input id="signup-name" name="full_name" class="form-control" type="text" autocomplete="name" required minlength="2" maxlength="100" /></div>
+              <div><label class="form-label" for="signup-email">Email address</label><input id="signup-email" name="email" class="form-control" type="email" autocomplete="email" required /></div>
+              <div><label class="form-label" for="signup-password">Create a password</label><input id="signup-password" name="password" class="form-control" type="password" autocomplete="new-password" required minlength="8" /></div>
+              <p id="signup-message" class="form-message hidden" role="status"></p>
+              <button id="signup-submit" class="primary-button w-full" type="submit">Send access request</button>
+              <p class="text-xs leading-5 text-slate-400">Your classroom account is created only after the teacher approves your request. Confirm your email first if asked.</p>
+            </form>
+          </details>
         </div>
         <p class="login-footer">AI 2nd Batch · Thakurgaon</p>
       </section>

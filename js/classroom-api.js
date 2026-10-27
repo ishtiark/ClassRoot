@@ -169,9 +169,46 @@ export async function reviewSubmission(id, grade, feedback) {
 export async function getRoster() {
   const supabase = await getSupabaseClient();
   return queryData(
-    supabase.from("profiles").select("id, full_name, student_number").eq("role", "student").order("full_name"),
+    supabase.from("profiles").select("id, full_name, student_number, active").eq("role", "student").order("full_name"),
     "Could not load the student roster",
   );
+}
+
+export async function getEnrollmentRequests() {
+  const supabase = await getSupabaseClient();
+  return queryData(
+    supabase.from("enrollment_requests")
+      .select("id, email, full_name, status, created_at")
+      .eq("status", "pending")
+      .order("created_at"),
+    "Could not load student access requests",
+  );
+}
+
+export async function approveEnrollmentRequest(id, studentNumber) {
+  const supabase = await getSupabaseClient();
+  const { error } = await supabase.rpc("approve_enrollment_request", {
+    target_request: id,
+    assigned_student_number: studentNumber,
+  });
+  if (error) throw new Error(`Could not approve the student request: ${error.message}`);
+}
+
+export async function rejectEnrollmentRequest(id) {
+  const supabase = await getSupabaseClient();
+  const { error } = await supabase.rpc("reject_enrollment_request", {
+    target_request: id,
+  });
+  if (error) throw new Error(`Could not reject the student request: ${error.message}`);
+}
+
+export async function setStudentAccess(id, enabled) {
+  const supabase = await getSupabaseClient();
+  const { error } = await supabase.rpc("set_student_access", {
+    target_student: id,
+    enable_access: enabled,
+  });
+  if (error) throw new Error(`Could not update student access: ${error.message}`);
 }
 
 export async function updateStudentProfile(id, fullName, studentNumber) {
