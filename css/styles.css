@@ -1169,6 +1169,7 @@ html[data-theme="dark"] .login-screen:not(.hidden) {
 html[data-theme="dark"] .login-layout,
 html[data-theme="dark"] .login-card,
 html[data-theme="dark"] .panel-card,
+html[data-theme="dark"] .stat-card,
 html[data-theme="dark"] .teacher-card,
 html[data-theme="dark"] .edit-dialog {
   border-color: #29364a;
@@ -1402,6 +1403,41 @@ html[data-theme="dark"] .edit-dialog::backdrop {
 
 html[data-theme="dark"] .art-main-card {
   color: #1b2944;
+}
+
+html[data-theme="dark"] .stat-card-active {
+  border-color: #25634f;
+  background: linear-gradient(145deg, #17372f, #142c2b);
+}
+
+html[data-theme="dark"] .stat-card-active .stat-value {
+  color: #86efac;
+}
+
+html[data-theme="dark"] .stat-card-review {
+  border-color: #72531d;
+  background: linear-gradient(145deg, #392d18, #2d261a);
+}
+
+html[data-theme="dark"] .stat-card-review .stat-value {
+  color: #fcd34d;
+}
+
+html[data-theme="dark"] .stat-card-projects {
+  border-color: #43417e;
+  background: linear-gradient(145deg, #292748, #22243d);
+}
+
+html[data-theme="dark"] .stat-card-projects .stat-value {
+  color: #c4b5fd;
+}
+
+html[data-theme="dark"] .stat-card .stat-label {
+  color: #d3deec;
+}
+
+html[data-theme="dark"] .stat-card .stat-hint {
+  color: #a8b6c8;
 }
 
 @media (max-width: 640px) {
