@@ -19,33 +19,72 @@
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <main id="main-content" class="min-h-screen">
       <section id="login-screen" class="login-screen" aria-labelledby="login-title">
-        <div class="login-card">
-          <div class="mb-8 inline-flex items-center gap-3">
-            <span class="brand-mark" aria-hidden="true">AI</span>
-            <span><span class="block font-display text-lg font-extrabold tracking-tight text-slate-900">AI 2nd Batch</span><span class="block text-xs font-semibold tracking-wide text-slate-400">TRAINING · THAKURGAON</span></span>
+        <div class="login-layout">
+          <aside class="login-story" aria-label="About the classroom">
+            <div class="story-topline">
+              <span class="story-brand-mark" aria-hidden="true">AI</span>
+              <span class="story-brand-name">AI 2nd Batch</span>
+              <span class="story-location">THAKURGAON</span>
+            </div>
+            <div class="story-copy">
+              <p class="story-kicker"><span></span> YOUR CLASSROOM, ONLINE</p>
+              <h2 class="story-heading">Curiosity takes you <span>further.</span></h2>
+              <p class="story-description">A welcoming space to learn new skills, share ideas, and build what comes next — together.</p>
+            </div>
+            <div class="story-art" aria-hidden="true">
+              <div class="art-orbit art-orbit-one"></div>
+              <div class="art-orbit art-orbit-two"></div>
+              <div class="art-spark art-spark-one">✳</div>
+              <div class="art-spark art-spark-two">✦</div>
+              <div class="art-note art-note-top"><span class="art-note-icon">✳</span><span><strong>Keep exploring</strong><small>There’s always more to learn</small></span></div>
+              <div class="art-main-card">
+                <span class="art-card-label">YOUR NEXT CHAPTER</span>
+                <span class="art-book-icon">A<span>+</span></span>
+                <span class="art-card-title">Learn. Create.<br />Make an impact.</span>
+                <span class="art-card-dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+              </div>
+              <div class="art-note art-note-bottom"><span class="art-avatar">✦</span><span><strong>Better, together</strong><small>One classroom. Many bright ideas.</small></span></div>
+            </div>
+            <div class="story-footer"><span>LEARN TOGETHER</span><span class="story-footer-line"></span><span>GROW EVERY DAY</span></div>
+          </aside>
+          <div class="login-card">
+            <div class="auth-brand">
+              <span class="brand-mark" aria-hidden="true">AI</span>
+              <span><span class="block font-display text-base font-extrabold tracking-tight text-slate-900">AI 2nd Batch</span><span class="block text-xs font-semibold tracking-wide text-slate-400">TRAINING · THAKURGAON</span></span>
+            </div>
+            <div class="auth-switcher" role="group" aria-label="Account options">
+              <button id="login-mode-button" class="auth-mode-button" type="button" aria-pressed="true">Sign in</button>
+              <button id="signup-mode-button" class="auth-mode-button" type="button" aria-pressed="false">Request access</button>
+            </div>
+            <p id="auth-eyebrow" class="section-eyebrow mt-7">WELCOME BACK</p>
+            <h1 id="login-title" class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">Sign in to your classroom</h1>
+            <p id="auth-description" class="mt-2 text-sm leading-6 text-slate-500">Use your classroom email and password to continue.</p>
+            <div id="login-panel">
+              <form id="login-form" class="mt-7 space-y-4" novalidate>
+                <div><label class="form-label" for="login-email">Email address</label><input id="login-email" name="email" class="form-control" type="email" autocomplete="username" required /></div>
+                <div><label class="form-label" for="login-password">Password</label><input id="login-password" name="password" class="form-control" type="password" autocomplete="current-password" required minlength="6" /></div>
+                <p id="login-message" class="form-message hidden" role="alert"></p>
+                <button id="login-submit" class="primary-button w-full" type="submit">Sign in to classroom <span aria-hidden="true">→</span></button>
+              </form>
+            </div>
+            <div id="signup-panel" class="hidden">
+              <form id="student-signup-form" class="mt-7 space-y-4" novalidate>
+                <div><label class="form-label" for="signup-name">Full name</label><input id="signup-name" name="full_name" class="form-control" type="text" autocomplete="name" required minlength="2" maxlength="100" /></div>
+                <div><label class="form-label" for="signup-email">Email address</label><input id="signup-email" name="email" class="form-control" type="email" autocomplete="email" required /></div>
+                <div>
+                  <label class="form-label" for="signup-password">Create a password</label>
+                  <input id="signup-password" name="password" class="form-control" type="password" autocomplete="new-password" required minlength="8" aria-describedby="signup-password-hint" />
+                  <p id="signup-password-hint" class="mt-1.5 text-xs text-slate-400">Use at least 8 characters.</p>
+                </div>
+                <p id="signup-message" class="form-message hidden" role="status"></p>
+                <button id="signup-submit" class="primary-button w-full" type="submit">Send access request <span aria-hidden="true">→</span></button>
+                <p class="text-xs leading-5 text-slate-500">Your account becomes active after teacher approval. If email confirmation is requested, confirm your address first.</p>
+              </form>
+            </div>
+            <p class="auth-assurance"><span aria-hidden="true">✓</span> A safe, supportive space for our classroom</p>
           </div>
-          <p class="section-eyebrow">WELCOME BACK</p>
-          <h1 id="login-title" class="mt-2 font-display text-2xl font-extrabold tracking-tight text-slate-900">Sign in to your classroom</h1>
-          <p class="mt-2 text-sm leading-6 text-slate-500">Sign in with your classroom email and password.</p>
-          <form id="login-form" class="mt-7 space-y-4" novalidate>
-            <div><label class="form-label" for="login-email">Email address</label><input id="login-email" name="email" class="form-control" type="email" autocomplete="username" required /></div>
-            <div><label class="form-label" for="login-password">Password</label><input id="login-password" name="password" class="form-control" type="password" autocomplete="current-password" required minlength="6" /></div>
-            <p id="login-message" class="form-message hidden" role="alert"></p>
-            <button id="login-submit" class="primary-button w-full" type="submit">Sign in</button>
-          </form>
-          <details class="mt-6 border-t border-slate-100 pt-4">
-            <summary class="cursor-pointer text-center text-sm font-bold text-blue-700">New student? Request access</summary>
-            <form id="student-signup-form" class="mt-4 space-y-4" novalidate>
-              <div><label class="form-label" for="signup-name">Full name</label><input id="signup-name" name="full_name" class="form-control" type="text" autocomplete="name" required minlength="2" maxlength="100" /></div>
-              <div><label class="form-label" for="signup-email">Email address</label><input id="signup-email" name="email" class="form-control" type="email" autocomplete="email" required /></div>
-              <div><label class="form-label" for="signup-password">Create a password</label><input id="signup-password" name="password" class="form-control" type="password" autocomplete="new-password" required minlength="8" /></div>
-              <p id="signup-message" class="form-message hidden" role="status"></p>
-              <button id="signup-submit" class="primary-button w-full" type="submit">Send access request</button>
-              <p class="text-xs leading-5 text-slate-400">Your classroom account is created only after the teacher approves your request. Confirm your email first if asked.</p>
-            </form>
-          </details>
         </div>
-        <p class="login-footer">AI 2nd Batch · Thakurgaon</p>
+        <p class="login-footer">© AI 2nd Batch <span aria-hidden="true">·</span> Thakurgaon</p>
       </section>
 
       <div id="app-shell" class="hidden min-h-screen lg:flex">

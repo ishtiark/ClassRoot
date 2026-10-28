@@ -89,15 +89,39 @@ function safeExternalUrl(value) {
   }
 }
 
+function setAuthMode(mode) {
+  const isSignup = mode === "signup";
+  const loginPanel = document.querySelector("#login-panel");
+  const signupPanel = document.querySelector("#signup-panel");
+  const activePanel = isSignup ? signupPanel : loginPanel;
+  loginPanel.classList.toggle("hidden", isSignup);
+  signupPanel.classList.toggle("hidden", !isSignup);
+  activePanel.classList.remove("auth-panel-enter");
+  void activePanel.offsetWidth;
+  activePanel.classList.add("auth-panel-enter");
+  document.querySelector("#login-mode-button").setAttribute("aria-pressed", String(!isSignup));
+  document.querySelector("#signup-mode-button").setAttribute("aria-pressed", String(isSignup));
+  document.querySelector("#auth-eyebrow").textContent = isSignup ? "NEW STUDENT" : "WELCOME BACK";
+  document.querySelector("#login-title").textContent = isSignup ? "Request classroom access" : "Sign in to your classroom";
+  document.querySelector("#auth-description").textContent = isSignup
+    ? "Create your student request. Your teacher will review it before your account is activated."
+    : "Use your classroom email and password to continue.";
+  document.querySelector("#login-message").classList.add("hidden");
+  document.querySelector("#signup-message").classList.add("hidden");
+  document.querySelector(".login-card").scrollTop = 0;
+  document.querySelector(isSignup ? "#signup-name" : "#login-email").focus({ preventScroll: true });
+}
+
 function showLogin(message = "", isError = true) {
   activeSession = null;
   document.querySelector("#app-shell").classList.add("hidden");
   document.querySelector("#login-screen").classList.remove("hidden");
+  setAuthMode("login");
   const element = document.querySelector("#login-message");
   element.textContent = message;
   element.classList.toggle("hidden", !message);
   element.classList.toggle("error", isError);
-  document.querySelector("#login-email").focus();
+  document.querySelector("#login-email").focus({ preventScroll: true });
 }
 
 function showApp(session) {
@@ -669,6 +693,8 @@ async function handleSignOut() {
 }
 
 function bindEvents() {
+  document.querySelector("#login-mode-button").addEventListener("click", () => setAuthMode("login"));
+  document.querySelector("#signup-mode-button").addEventListener("click", () => setAuthMode("signup"));
   document.querySelector("#login-form").addEventListener("submit", handleLogin);
   document.querySelector("#student-signup-form").addEventListener("submit", handleStudentSignup);
   document.querySelector("#sign-out-button").addEventListener("click", handleSignOut);

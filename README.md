@@ -31,7 +31,7 @@ The workflow deploys the static files directly; no build step is required.
 
 ## 5. Create teacher and student accounts
 
-Create the teacher Auth account through Supabase dashboard user management, then add its matching profile from the SQL Editor. Do not expose a service-role key. For students, they can select **New student? Request access** on the sign-in page. The teacher reviews their name and email in the dashboard and assigns a unique student number when approving. Rejected requests and unapproved accounts cannot access classroom data.
+Create the teacher Auth account through Supabase dashboard user management, then add its matching profile from the SQL Editor. Do not expose a service-role key. Students can select **Request access** on the sign-in page to submit a registration request. The teacher reviews their name and email in the dashboard and assigns a unique student number when approving. Rejected requests and unapproved accounts cannot access classroom data.
 
 To add an existing Auth user as the teacher, replace the sample values with that user's exact Auth email:
 
