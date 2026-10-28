@@ -6,6 +6,19 @@
     <meta name="theme-color" content="#f8fafc" />
     <meta name="description" content="AI 2nd Batch classroom for lessons, assignments, and student work in Thakurgaon." />
     <title>AI 2nd Batch · Thakurgaon</title>
+    <script>
+      (() => {
+        let theme;
+        try {
+          theme = localStorage.getItem("classroot-theme");
+        } catch {
+          theme = null;
+        }
+        document.documentElement.dataset.theme = theme === "dark" || theme === "light"
+          ? theme
+          : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      })();
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -19,6 +32,9 @@
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <main id="main-content" class="min-h-screen">
       <section id="login-screen" class="login-screen" aria-labelledby="login-title">
+        <button class="theme-toggle theme-toggle-login" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Switch to dark mode">
+          <span class="theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon-sun" aria-hidden="true">☀</span><span class="theme-toggle-label">Dark mode</span>
+        </button>
         <div class="login-layout">
           <aside class="login-story" aria-label="About the classroom">
             <div class="story-topline">
@@ -130,6 +146,9 @@
               <div><p id="header-date" class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400"></p><p id="page-heading" class="font-display text-lg font-bold text-slate-900">Classroom overview</p></div>
             </div>
             <div id="header-avatar" class="avatar avatar-sky" aria-label="Signed-in profile">?</div>
+            <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to dark mode" title="Switch to dark mode">
+              <span class="theme-icon-moon" aria-hidden="true">☾</span><span class="theme-icon-sun" aria-hidden="true">☀</span><span class="theme-toggle-label">Dark mode</span>
+            </button>
           </header>
           <div id="page-content" class="mx-auto max-w-[1440px] px-4 py-7 md:px-8 md:py-9" tabindex="-1"></div>
         </div>

@@ -89,6 +89,25 @@ function safeExternalUrl(value) {
   }
 }
 
+function setTheme(theme, persist = false) {
+  const isDark = theme === "dark";
+  document.documentElement.dataset.theme = isDark ? "dark" : "light";
+  document.querySelector('meta[name="theme-color"]').content = isDark ? "#0b1120" : "#f8fafc";
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    const label = isDark ? "Switch to light mode" : "Switch to dark mode";
+    button.setAttribute("aria-label", label);
+    button.title = label;
+    button.querySelector(".theme-toggle-label").textContent = isDark ? "Light mode" : "Dark mode";
+  });
+  if (persist) {
+    try {
+      localStorage.setItem("classroot-theme", isDark ? "dark" : "light");
+    } catch {
+      // The selected theme remains active for this page even if storage is unavailable.
+    }
+  }
+}
+
 function setAuthMode(mode) {
   const isSignup = mode === "signup";
   const loginPanel = document.querySelector("#login-panel");
@@ -693,6 +712,13 @@ async function handleSignOut() {
 }
 
 function bindEvents() {
+  setTheme(document.documentElement.dataset.theme || "light");
+  document.querySelectorAll("[data-theme-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const currentTheme = document.documentElement.dataset.theme;
+      setTheme(currentTheme === "dark" ? "light" : "dark", true);
+    });
+  });
   document.querySelector("#login-mode-button").addEventListener("click", () => setAuthMode("login"));
   document.querySelector("#signup-mode-button").addEventListener("click", () => setAuthMode("signup"));
   document.querySelector("#login-form").addEventListener("submit", handleLogin);
